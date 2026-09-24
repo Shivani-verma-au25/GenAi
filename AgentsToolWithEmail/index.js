@@ -6,6 +6,7 @@ import  {ChatGoogle} from "@langchain/google"
 import * as z from "zod"
 import { tool } from "@langchain/core/tools";
 import { sendEmail } from "./mail.service.js";
+import { addToNumbers } from "./calculator.service.js";
 
 dotenv.config();
 
@@ -19,6 +20,19 @@ const emailTool = tool(
             to : z.string().describe("The recipient's email address"),
             html : z.string().describe("The HTML content of the email"),
             subject:z.string().describe("The subject of the email") 
+        })
+    }
+);
+
+const addTwoNumers = tool(
+    addToNumbers,
+    {
+        name : "Add_numbers",
+        deccription : "Add to numbers",
+
+        schema : z.object({
+            num1 : z.number().describe("First number"),
+            num2 : z.number().describe("Second number")
         })
     }
 );
@@ -41,7 +55,7 @@ const googleModel = new ChatGoogle({
 
 const AiAgent = createAgent({
     model :googleModel,
-    tools : [emailTool]
+    tools : [emailTool ,addTwoNumers]
 });
 
 
