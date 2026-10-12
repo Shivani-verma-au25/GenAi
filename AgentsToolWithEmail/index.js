@@ -10,7 +10,7 @@ import { addToNumbers } from "./calculator.service.js";
 
 dotenv.config();
 
-
+// send eamil tool
 const emailTool = tool(
     sendEmail,
     {
@@ -24,6 +24,7 @@ const emailTool = tool(
     }
 );
 
+// add two numbers tool
 const addTwoNumers = tool(
     addToNumbers,
     {
@@ -38,13 +39,14 @@ const addTwoNumers = tool(
 );
 
 
-
+// readline interface to read user input from the command line
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
 
 
+// creating a mistral model instance with the specified model name and API key
 const googleModel = new ChatGoogle({
     model : "gemini-3.6-flash",
     apiKey : process.env.GEMINI_API_KEY
