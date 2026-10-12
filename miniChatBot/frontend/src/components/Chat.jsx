@@ -4,10 +4,12 @@ function Chatbot() {
     const [input, setInput] = useState("");
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [error ,setError] = useState("");
 
     const sendMessage = async () => {
         if (!input.trim() || loading) return;
 
+        setError(""); // Clear previous error   
         const userMessage = {
             role: "user",
             content: input,
@@ -47,6 +49,7 @@ function Chatbot() {
             setMessages([...updatedMessages, aiMessage]);
         } catch (error) {
             console.error("Chat error:", error);
+            setError(error.message || "An error occurred while sending the message.");
         } finally {
             setLoading(false);
         }
@@ -61,13 +64,21 @@ function Chatbot() {
                     <p key={index}>
                         <strong>{message.role === "user" ? "You" : "AI"}:</strong>{" "}
                         {message.content}
+                         
                     </p>
+                   
                 ))}
+                {error && <p style={{ color: "red" }}>{error}</p>}
             </div>
 
             <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
+                onKeyDown ={(e) =>{
+                    if(e.key === "Enter"){
+                        sendMessage();
+                    }
+                }}
                 placeholder="Type your message..."
             />
 
