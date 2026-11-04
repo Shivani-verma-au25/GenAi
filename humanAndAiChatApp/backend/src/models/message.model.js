@@ -3,7 +3,7 @@ import mongoose ,{Schema} from "mongoose";
 const messageSchema = new Schema({
     chat:{
         type :Schema.Types.ObjectId,
-        ref : "ChatModel",
+        ref : "Chat",
         // required : [true , "Chat is required"]
     },
     content : {

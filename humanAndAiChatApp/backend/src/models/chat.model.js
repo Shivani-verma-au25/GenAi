@@ -1,11 +1,11 @@
-import {Schema } from "mongoose"
+import mongoose , {Schema } from "mongoose"
 
 
 const chatSchema = new Schema({
     user:{
         type :Schema.Types.ObjectId,
-        ref : "UserModel",
-        required : [true , "User is required"]
+        ref : "User",
+        // required : [true , "User is required"]
     },
     title:{
         type :String,
@@ -14,4 +14,4 @@ const chatSchema = new Schema({
     }
 } ,{timestamps : true});
 
-export const ChatModel = mongoose.model("Chat" , chatSchema);   
+export const Chat = mongoose.model("Chat",chatSchema);   
