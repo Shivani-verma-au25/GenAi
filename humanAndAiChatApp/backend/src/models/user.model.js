@@ -1,5 +1,6 @@
-import {Schema} from "mongoose"
+import mongoose, {Schema} from "mongoose"
 import bcrypt from "bcrypt"
+import jwt from 'jsonwebtoken'
 
 
 const userSchema = new Schema({
@@ -31,7 +32,27 @@ userSchema.pre("save", async function(next){
 
     return this.password =await bcrypt.hash(this.password , 10);
     next();
-})
+});
 
+
+userSchema.methods.isPasswordCorrect = async function (password) {
+    return await bcrypt.compare(password,this.password)
+}
+
+
+userSchema.methods.generateUserAccessToken = async function(){
+    // that is short live token
+    return jwt.sign(
+        {
+            _id:this._id,
+            email: this.email,
+            userName : this.userName,
+        },
+        process.env.SECRET_ACCESS_TOKEN,
+        {
+            expiresIn : process.env.SECRET_ACCESS_TOKEN_EXPIRY
+        }
+    )
+}
 export const UserModel = mongoose.model("User" , userSchema);
 

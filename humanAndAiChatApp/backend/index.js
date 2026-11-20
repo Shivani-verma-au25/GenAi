@@ -15,18 +15,21 @@ app.use(express.urlencoded({extended : true}));
 
 
 // routes
+import chatRouters from "./src/routes/chats.routes.js"
+import authRouters from  "./src/routes/auth.routes.js"
+
+app.use("/api", chatRouters)
+app.use("/api" , authRouters)
 
 
-import chatRouter from "./src/routes/chats.routes.js";
-app.use("/api", chatRouter);
 
-
-
-dbConnecton().then(() =>{
-    app.listen(3000 ,() =>{
-    console.log("Server is running on port 3000");
-    })
-}).catch((error) =>{
-    console.error("Error occurred while connecting to the database:", error);
+dbConnecton().then(()=>{
+    app.listen(8000, () => {
+    console.log("Server is running on port 8000");
+    });
+}).catch((err) =>{
+    console.log("Getting error while connecting to  the database :-", err);
+    
 })
+
 
