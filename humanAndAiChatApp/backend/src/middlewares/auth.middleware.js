@@ -4,7 +4,6 @@ import { UserModel } from '../models/user.model.js';
 
 export const authVerify = async ( req , res ,next)=>{
     const token = req.cookies.accessToken || req.header("Authorization")?.replace("Bearer " , "");
-    console.log("tken" , token);
 
     if(!token){
         return res.status(409).json({
@@ -19,6 +18,7 @@ export const authVerify = async ( req , res ,next)=>{
 
         const decodedToken = jwt.verify(token ,process.env.SECRET_ACCESS_TOKEN);
         const user = await UserModel.findById(decodedToken?._id).select('-password');
+        
 
         if(!user){
             return res.status(404).json({

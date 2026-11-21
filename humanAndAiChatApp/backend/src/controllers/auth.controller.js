@@ -89,7 +89,6 @@ export const userRegisterController = async (req, res) =>{
 
 
 // user login controller
-
 export const userLoginRegister = async(req ,res) =>{
     try {
         const {email,password} = req.body;
@@ -144,11 +143,13 @@ export const userLoginRegister = async(req ,res) =>{
         }
 
         return res.status(200)
-        .cookie("accessToken" , token,{ 
-            httpOnly : true,
-            secure : true,
-
-        })
+        .cookie("accessToken" , token,{
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: process.env.NODE_ENV === "production"
+                    ? "none"
+                    : "lax"
+            })
         .json({
             success : true ,
             message :  user?.userName + "is Logged in successsfully",
@@ -168,38 +169,40 @@ export const userLoginRegister = async(req ,res) =>{
 
 
 // logout user controller
+export const userLogOutController = async (req, res) => {
+    console.log("Authenticated user:", req.user);
 
-export const userLogOutController = async( req ,res) =>{
     try {
-        console.log("user"  , res.user);
-        
-        if(!req.user || !req.user?._id){
-            return res.status(409).json({
-                success : false,
-                message : "User not Authorized.",
-                error : "User not Authorized."
-            })
-        };
+        if (!req.user || !req.user._id) {
+            return res.status(401).json({
+                success: false,
+                message: "User not authorized",
+                error: "User not authorized"
+            });
+        }
 
-        // update the fields in db
-
-        // clear cookies
-
+        // Clear authentication cookie
         return res.status(200)
-        .clearCookie("accessToken",{httpOnly : true ,  secure : true})
-        .json({
-            success : true,
-            message :"User logged out",
-            user : {}
-        })
-    
-        
+            .clearCookie("accessToken", {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: process.env.NODE_ENV === "production"
+                    ? "none"
+                    : "lax"
+            })
+            .json({
+                success: true,
+                message: "User logged out successfully",
+                user: {}
+            });
+
     } catch (error) {
-        console.log("getting error while logging out ", error);
+        console.error("Error while logging out:", error);
+
         return res.status(500).json({
-            success:false,
-            message : "Something went wrong while logging out.",
-            error : error?.message
-        })
+            success: false,
+            message: "Something went wrong while logging out",
+            error: error.message
+        });
     }
-}
+};
