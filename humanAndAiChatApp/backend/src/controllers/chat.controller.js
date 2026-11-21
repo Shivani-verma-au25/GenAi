@@ -89,13 +89,118 @@ import { Chat } from "../models/chat.model.js"
 
 
 
+// export const aiMessageResponseController = async (req, res) => {
+//     try {
+//         const { message } = req.body;
+
+//         const userId =  req.user?._id;
+
+//         if (!message) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: "Message is required"
+//             });
+//         }
+
+//         if (!userId) {
+//             return res.status(401).json({
+//                 success: false,
+//                 message: "User is required"
+//             });
+//         }
+
+//         let chat;
+//         let title = null;
+//         const gettingexistchatId = await MessageModel.findById(chat);
+//         console.log("geting cgat ",gettingexistchatId);
+        
+
+//         // STEP 1: Find existing chat OR create new chat
+//         // if (chatId) {
+//         //     chat = await Chat.findOne({
+//         //         _id: chatId,
+//         //         user: userId
+//         //     });
+
+//         //     if (!chat) {
+//         //         return res.status(404).json({
+//         //             success: false,
+//         //             message: "Chat not found"
+//         //         });
+//         //     }
+//         // } else {
+//         //     // Generate title only for a new chat
+//         //     title = await generateTitleFromGoogleModel(message);
+
+//         //     chat = await Chat.create({
+//         //         user: userId,
+//         //         title
+//         //     });
+//         // }
+
+//         // // STEP 2: If existing chat has no title, generate one
+//         // if (!chat.title) {
+//         //     title = await generateTitleFromGoogleModel(message);
+
+//         //     chat.title = title;
+//         //     await chat.save();
+//         // }
+
+//         // // STEP 3: Save user message
+//         // const userMessage = await MessageModel.create({
+//         //     chat: chat._id,
+//         //     content: message,
+//         //     role: "user"
+//         // });
+
+//         // // STEP 4: Get conversation history
+//         // const allMessages = await MessageModel.find({
+//         //     chat: chat._id
+//         // }).sort({ createdAt: 1 });
+
+//         // // STEP 5: Get Google AI response
+//         // const response = await googleModelResponse(allMessages);
+
+//         // if (!response) {
+//         //     return res.status(500).json({
+//         //         success: false,
+//         //         message: "Failed to get response from Google Model"
+//         //     });
+//         // }
+
+//         // // STEP 6: Save AI response
+//         // const aiMessage = await MessageModel.create({
+//         //     chat: chat._id,
+//         //     content: response,
+//         //     role: "Ai"
+//         // });
+
+//         // // STEP 7: Send response
+//         // return res.status(200).json({
+//         //     success: true,
+//         //     message: "Response from Google Model",
+//         //     data: aiMessage,
+//         //     chatTitle: chat.title
+//         // });
+
+//     } catch (error) {
+//         console.error("Error occurred while saving messages:", error);
+
+//         return res.status(500).json({
+//             success: false,
+//             error: error.message
+//         });
+//     }
+// };
+
+
 export const aiMessageResponseController = async (req, res) => {
     try {
-        const { message, chatId, userID } = req.body;
+        // 1. Get data
+        const { message, chatId } = req.body;
+        const userId = req.user?._id;
 
-        const userId = userID || req.user?._id;
-
-        if (!message) {
+        if (!message?.trim()) {
             return res.status(400).json({
                 success: false,
                 message: "Message is required"
@@ -105,14 +210,14 @@ export const aiMessageResponseController = async (req, res) => {
         if (!userId) {
             return res.status(401).json({
                 success: false,
-                message: "User is required"
+                message: "User is not authenticated"
             });
         }
 
         let chat;
         let title = null;
 
-        // STEP 1: Find existing chat OR create new chat
+        // 2. Check whether chat already exists
         if (chatId) {
             chat = await Chat.findOne({
                 _id: chatId,
@@ -125,8 +230,9 @@ export const aiMessageResponseController = async (req, res) => {
                     message: "Chat not found"
                 });
             }
+
         } else {
-            // Generate title only for a new chat
+            // 3. Create a new chat and generate title
             title = await generateTitleFromGoogleModel(message);
 
             chat = await Chat.create({
@@ -135,53 +241,45 @@ export const aiMessageResponseController = async (req, res) => {
             });
         }
 
-        // STEP 2: If existing chat has no title, generate one
-        if (!chat.title) {
-            title = await generateTitleFromGoogleModel(message);
-
-            chat.title = title;
-            await chat.save();
-        }
-
-        // STEP 3: Save user message
+        // 4. Save user message
         const userMessage = await MessageModel.create({
             chat: chat._id,
             content: message,
             role: "user"
         });
 
-        // STEP 4: Get conversation history
+        // 5. Get conversation history
         const allMessages = await MessageModel.find({
             chat: chat._id
         }).sort({ createdAt: 1 });
 
-        // STEP 5: Get Google AI response
+        // 6. Get AI response
         const response = await googleModelResponse(allMessages);
 
         if (!response) {
             return res.status(500).json({
                 success: false,
-                message: "Failed to get response from Google Model"
+                message: "Failed to get AI response"
             });
         }
 
-        // STEP 6: Save AI response
+        // 7. Save AI response
         const aiMessage = await MessageModel.create({
             chat: chat._id,
             content: response,
             role: "Ai"
         });
 
-        // STEP 7: Send response
+        // 8. Return response
         return res.status(200).json({
             success: true,
-            message: "Response from Google Model",
-            data: aiMessage,
-            chatTitle: chat.title
+            message: "AI response generated successfully",
+            chatTitle: chat.title,
+            data : aiMessage
         });
 
     } catch (error) {
-        console.error("Error occurred while saving messages:", error);
+        console.error("Error in AI controller:", error);
 
         return res.status(500).json({
             success: false,
@@ -189,7 +287,6 @@ export const aiMessageResponseController = async (req, res) => {
         });
     }
 };
-
 
 
 export const getAllChatOFUserController = async (req, res) => {

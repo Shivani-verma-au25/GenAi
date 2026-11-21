@@ -4,7 +4,7 @@ const messageSchema = new Schema({
     chat:{
         type :Schema.Types.ObjectId,
         ref : "Chat",
-        // required : [true , "Chat is required"]
+        required : [true , "Chat is required"]
     },
     content : {
         type :String,
