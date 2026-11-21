@@ -194,6 +194,9 @@ import { Chat } from "../models/chat.model.js"
 // };
 
 
+
+
+// converstion chat user and ai 
 export const aiMessageResponseController = async (req, res) => {
     try {
         // 1. Get data
@@ -288,12 +291,11 @@ export const aiMessageResponseController = async (req, res) => {
     }
 };
 
-
+// get all chat fron the  users
 export const getAllChatOFUserController = async (req, res) => {
-    const {userDemo} = req.body;
-    const user = req?.user || userDemo;
+    const user = req?.user ;
     try {
-        if (!userDemo) {
+        if (!user) {
             return res.status(401).json({
                 success: false,
                 message: "User is not authenticated",
@@ -319,12 +321,12 @@ export const getAllChatOFUserController = async (req, res) => {
 
 
 // get messages return a particular chat of the chatid
-
 export const getMessages = async(req ,res) =>{
 
     const {chatId} = req.params;
+    
     try {
-        const chat = await MessageModel.findOne({ _id: chatId , user : req?.user?._id }).populate("chat");
+        const chat = await Chat.findOne({ _id: chatId , user : req?.user?._id });
         if (!chat){
             return res.status(404).json({
                 success: false,
@@ -346,35 +348,51 @@ export const getMessages = async(req ,res) =>{
 };
 
 // delete chats
-
 export const deleteChatsController = async (req, res) => {
-    const {chatId} = req?.params;
+    const { chatId } = req.params;
 
     try {
+        // 1. Check authenticated user
+        const userId = req.user?._id;
+
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "User not authorized"
+            });
+        }
+
+        // 2. Find and delete chat belonging to user
         const chat = await Chat.findOneAndDelete({
-            _id:chatId,
-            user : req?.user._id
+            _id: chatId,
+            user: userId
         });
 
-        // delete all messages related to the chat
-        await  MessageModel.deleteMany({
-            chat:chatId
-        })
-
-        if(!chat){
+        if (!chat) {
             return res.status(404).json({
                 success: false,
-                message: "Chat not found",
-                error: "Chat not found"
-            })
-        };
+                message: "Chat not found"
+            });
+        }
 
-        return res.status(200).josn({
-            success : true,
-            message:"Chat deleted successfully!"
-        })
+        // 3. Delete all messages belonging to this chat
+        await MessageModel.deleteMany({
+            chat: chat._id
+        });
+
+        // 4. Send response
+        return res.status(200).json({
+            success: true,
+            message: "Chat deleted successfully!"
+        });
+
     } catch (error) {
-        console.error("Error occurred while fetching chats:", error);
-        return res.status(500).json({ error: error.message });
+        console.error("Error while deleting chat:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while deleting chat",
+            error: error.message
+        });
     }
-}
+};

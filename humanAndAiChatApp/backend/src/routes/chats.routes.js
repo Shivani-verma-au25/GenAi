@@ -5,8 +5,8 @@ const router = Router();
 
 router.route("/ai-chat/response").post(authVerify, aiMessageResponseController);
 router.route("/get-all-chats").get(authVerify , getAllChatOFUserController)
-router.route("/:chatId/messages").get(getMessages);
-router.route("/delete/:chatId").delete(deleteChatsController)
+router.route("/:chatId/messages").get(authVerify , getMessages);
+router.route("/delete/:chatId").delete(authVerify , deleteChatsController)
 
 
 
