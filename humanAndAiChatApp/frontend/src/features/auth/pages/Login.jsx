@@ -1,5 +1,48 @@
+import { useState } from "react";
+import { useAuth } from "../hooks/useAuth.hook";
+import { useNavigate } from "react-router-dom";
+
 
 export default function Login() {
+    const {handleLogin} = useAuth()
+    const navigate = useNavigate();
+
+    const [data , setData] = useState({
+        email : "",
+        password : ""
+    });
+
+    const onChange = (e) =>{
+        const {name,value} = e.target;
+        setData((prev) =>({
+            ...prev ,
+            [name]:value
+        }));
+    };
+
+    // handle submit form
+
+    const handleSumbit= async (e) =>{
+        e.preventDefault();
+
+        const res = await handleLogin(data);
+        if(res?.success){
+            navigate("/dashboard")
+            // toast
+        }else{
+            console.log("login failed");
+            // toast
+        }
+
+        // setData({
+        //     email:"",
+        //     password : ""
+        // })
+        
+    }
+
+    console.log(data);
+    
   return (
     <div className="min-h-screen bg-white text-black flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md">
@@ -19,12 +62,15 @@ export default function Login() {
             Login to your account
           </h2>
 
-          <form className="space-y-5">
+          <form onSubmit={handleSumbit} className="space-y-5">
             <div>
               <label className="block text-sm font-medium mb-2">
                 Email Address
               </label>
               <input
+                name='email'
+                value={data.email}
+                onChange={onChange}
                 type="email"
                 placeholder="Enter your email"
                 required
@@ -37,6 +83,9 @@ export default function Login() {
                 Password
               </label>
               <input
+                name="password"
+                value={data.password}
+                onChange={onChange}
                 type="password"
                 placeholder="Enter your password"
                 required

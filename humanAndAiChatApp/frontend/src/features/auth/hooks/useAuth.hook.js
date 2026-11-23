@@ -1,7 +1,6 @@
 import { useState } from "react"
 import {useSelector , useDispatch} from "react-redux"
-import {setUser , setError ,setLoading} from "../services/auth.slice"
-import { useDispatch } from "react-redux"
+import {setUser ,setError ,setLoading} from "../services/auth.slice"
 import {registerApi ,loginApi, logoutApi ,getmeApi} from "../apis/auth.api"
 
 
@@ -19,7 +18,7 @@ export const useAuth =  ()=>{
             console.log("respoonse" , response);
             
             if(response?.success){
-                disptch(response?.data)    
+                disptch(setUser(response?.data))    
             }
 
         } catch (error) {
@@ -39,7 +38,7 @@ export const useAuth =  ()=>{
             const response = await loginApi(loginData);
             console.log("data" , response);
             if(response?.success){
-                disptch(response.data)
+                disptch(setUser(response.data))
             }           
         } catch (error) {
             console.log("error in auth hook:", error);
@@ -59,7 +58,7 @@ export const useAuth =  ()=>{
             const response = await logoutApi();
             console.log("data" , response);
             if(response?.success){
-                disptch(null)
+                disptch(setUser(null))
             }           
         } catch (error) {
             console.log("error in auth hook:", error);
@@ -75,10 +74,10 @@ export const useAuth =  ()=>{
         try {
             disptch(setLoading(true));
 
-            const response = await loginApi();
+            const response = await getmeApi();
             console.log("data" , response);
             if(response?.success){
-                disptch(response.data)
+                disptch(setUser(response.data))
             }           
         } catch (error) {
             console.log("error in auth hook:", error);

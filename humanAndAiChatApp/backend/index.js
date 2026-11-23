@@ -2,12 +2,19 @@ import express from "express"
 import dotenv from "dotenv"
 import cookieparser from "cookie-parser"
 import { dbConnecton } from "./src/db/databse.js";
+import cors from 'cors'
 
 dotenv.config();
 
 const app = express();
 
 // middlewares
+
+app.use(cors({
+    origin : 'http://localhost:5173/',
+    credentials :true
+}))
+
 app.use(cookieparser());
 app.use(express.json());
 app.use(express.urlencoded({extended : true}));
