@@ -1,10 +1,19 @@
-import React from 'react'
-import Dashboard from './features/chats/pages/Dashboard'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Dashboard from "./features/chats/pages/Dashboard";
+import Register from "./features/auth/pages/Register";
+import Login from "./features/auth/pages/Login";
 
-const App = () => {
+function App() {
   return (
-    <div><Dashboard/></div>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to="/register" />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="'/dashboard" element={<Dashboard />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;

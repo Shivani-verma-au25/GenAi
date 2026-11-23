@@ -32,7 +32,7 @@ export const useAuth =  ()=>{
 
 
     // handler user login
-    const hndleLogin = async(loginData) =>{
+    const handleLogin = async(loginData) =>{
         try {
             disptch(setLoading(true));
 
@@ -52,7 +52,7 @@ export const useAuth =  ()=>{
 
     // handle logout user
 
-     const hndleLogout = async() =>{
+     const handleLogout = async() =>{
         try {
             disptch(setLoading(true));
 
@@ -88,7 +88,7 @@ export const useAuth =  ()=>{
         }
     }
 
-   return { handleRegister , hndleLogin , hndleLogout , handleGetme}
+   return { handleRegister , handleLogin , handleLogout , handleGetme}
     
   
 }

@@ -14,6 +14,7 @@ import {
     ArrowDown,
     Menu,
 } from "lucide-react";
+import { useSelector } from 'react-redux';
 
 const initialChats = [
     { id: 1, title: "Understanding React Hooks" },
@@ -24,8 +25,8 @@ const initialChats = [
 
 const Dashboard = () => {
     // const chat  = useChat();
-    // const {user} = useSelector(state => state.auth);
-    // console.log(user);
+    // const {auth} = useSelector(state => state.auth);
+    // console.log("dashboard user",auth);
 
 
     // useEffect(() =>{
